@@ -1,6 +1,7 @@
 package com.max_pw_iw.person_publisher;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -26,37 +27,10 @@ import jakarta.jms.Session;
 
 
 @SpringBootApplication
-@EnableScheduling
-public class PersonPublisherApplication implements CommandLineRunner{
+public class PersonPublisherApplication{
 
 	public static void main(String[] args) {
 		SpringApplication.run(PersonPublisherApplication.class, args);
-	}
-
-	@Override
-	public void run(String... args) throws Exception {
-
-		List<EventPerson> people = new ArrayList<EventPerson>();
-
-		// ClassLoader classLoader = getClass().getClassLoader();
-
-		try (Scanner scanner = new Scanner(new File("/opt/app/data/Mock_data.csv"))) {
-			while (scanner.hasNextLine()) {
-				getPersonFromLine(scanner.nextLine());
-			}
-		}
-
-		for (EventPerson person : people) {
-			boolean eventSent = false;
-			while(!eventSent){
-				try{
-					sendEvent(person);
-					eventSent = true;
-				} catch (UncategorizedJmsException e){
-
-				}
-			}
-		}
 	}
 
 	@Autowired
@@ -64,6 +38,8 @@ public class PersonPublisherApplication implements CommandLineRunner{
 
 	@PostConstruct
 	private void customizeJmsTemplate() {
+
+		System.out.println("Running @PostConsctruct annotated method...");
 
 		// Update the jmsTopicTemplate's connection factory to cache the connection
 		CachingConnectionFactory tccf = new CachingConnectionFactory();
@@ -76,27 +52,58 @@ public class PersonPublisherApplication implements CommandLineRunner{
 		jmsTopicTemplate.setPubSubDomain(true);
 	}
 
+	@PostConstruct
+	private void sendPeopleFromCsv() {
+		
+		List<EventPerson> people = new ArrayList<EventPerson>();
+
+		//ClassLoader classLoader = getClass().getClassLoader();
+
+		File mockData = new File("/opt/app/data/Mock_data.csv");
+
+		try (Scanner scanner = new Scanner(mockData)) {
+			while (scanner.hasNextLine()) {
+				people.add(getPersonFromLine(scanner.nextLine()));
+			}
+		} catch (FileNotFoundException e){
+			System.out.println("Source file not found");
+		}
+
+		int eventRetriesMax = 20;
+		int eventRetries = 0;
+
+		for (EventPerson person : people) {
+			boolean eventSent = false;
+			while(!eventSent){
+				try{
+					sendEvent(person);
+					eventSent = true;
+					//System.out.println("Person sent as event: " + person.getFirstName());
+				} catch (UncategorizedJmsException e){
+					eventRetries++;
+					if(eventRetries >= eventRetriesMax){
+						System.out.println("Process has been stopped due to a series of UncategorizedJmsException (max retries reached on an event: " + Integer.toString(eventRetries)+ "). Make sure connection parameters are correctly set and that a Solace event broker is running");
+						return;
+					}
+				}
+			}
+		}
+	}
+
+
 	private EventPerson getPersonFromLine(String line){
 		EventPerson value = new EventPerson();
 		String[] values = line.split(",");
-		// value.setId(Long.parseLong(values[0]));
 		value.setFirstName(values[1]);
 		value.setLastName(values[2]);
 		value.setSex(values[4]);
 		value.setAge(Integer.parseInt(values[3]));
-		
+
 		return value;
 	}
 
 	@Value("people/add")
 	private String topicName;
-
-	// @Scheduled(fixedRate = 5000)
-	// public void sendEventToQueue() throws Exception {
-	// 	EventPerson eventPerson = new EventPerson("Bob","Steve",20,"Male");
-	// 	System.out.println("==========SENDING PERSON TO TOPIC: \"" + topicName + "\"========== " + eventPerson.getFirstName());
-	// 	sendEvent(eventPerson);
-	// }
 
 	public void sendEvent(EventPerson eventPerson){
 
@@ -105,7 +112,7 @@ public class PersonPublisherApplication implements CommandLineRunner{
         jmsTopicTemplate.send(topicName, new MessageCreator() {
 			@Override
 			public Message createMessage(Session session) throws JMSException {
-				System.out.println("==========SENDING PERSON TO TOPIC: \"" + topicName + "\"========== " + eventPerson.getFirstName());
+				// System.out.println("==========SENDING PERSON " + eventPerson.getFirstName() + " TO TOPIC: \"" + topicName + " \"========== ");
 				MapMessage mapMessage = session.createMapMessage();
 				mapMessage.setString("firstName", eventPerson.getFirstName()); 
 				mapMessage.setString("lastName", eventPerson.getLastName()); 

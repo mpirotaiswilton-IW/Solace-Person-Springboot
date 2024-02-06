@@ -59,25 +59,44 @@ content_header = {'Content-Type': 'application/json'}
 
 for queue in queues:
 
+    print("Sending request to create queue: " + queue.name)
+
+    print("\n -------- \n")
+
     queue_req_payload = {
         'queueName': queue.name,
         'permission': queue.permission,
         'accessType': queue.access_type,
-        'maxMsgspoolUsage': queue.maxMsgSpoolUsage,
+        'maxMsgSpoolUsage': queue.maxMsgSpoolUsage,
         'ingressEnabled': queue.ingress_enabled,
         'egressEnabled': queue.egress_enabled
     }
     
+
+
+
     req_url = "http://" + host_name + ":8080/SEMP/v2/config/msgVpns/" + msg_vpn_name + "/queues"
 
     queue_req = requests.post(url=req_url, json = queue_req_payload, headers = content_header, auth=basic)
 
+    print(queue_req.text)
+
     queue_check = requests.get(url="http://" + host_name + ":8080/SEMP/v2/config/msgVpns/" + msg_vpn_name + "/queues/" + queue.name, auth=basic)
 
     while(queue_check.status_code != 200):
+
+        print(queue_check.status_code)
+
         queue_check = requests.get(url="http://" + host_name + ":8080/SEMP/v2/config/msgVpns/" + msg_vpn_name + "/queues/" + queue.name, auth = basic)
+    
+    print("\n -------- \n")
+    print("Queue creation successful! : " + queue.name)
 
     for subscribed_topic in queue.subscribed_topics:
+
+        print("Sending request to create subscribed topic: " + subscribed_topic.topic + " --- for queue: " + queue.name)
+
+
         topic_req_payload = {
         'subscriptionTopic': subscribed_topic.topic
         }

@@ -47,7 +47,7 @@ public class PersonListener {
                 person.setSex(mm.getString("sex"));
                 person.setAge(mm.getInt("age"));
 				personService.AddPerson(person);
-                System.out.println("New poerson added to database: " + person.getFirstName());
+                System.out.println("New person added to database: " + person.getFirstName());
 			} catch (JMSException e) {
 				e.printStackTrace();
 			}

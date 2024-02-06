@@ -8,7 +8,8 @@ services:
     container_name: publisher_microservice
     restart: on-failure
     depends_on:
-      - solace-init
+      solace-init:
+        condition: service_completed_successfully
 
   db:
     image: postgres:13.1-alpine
@@ -88,6 +89,13 @@ services:
       - username_admin_globalaccesslevel=admin
       - username_admin_password=admin
       - system_scaling_maxconnectioncount=100
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+      start_interval: 5s
 
   solace-init:
     build:
@@ -96,7 +104,8 @@ services:
     container_name: solace-init
     restart: "no"
     depends_on:
-      - solace
+      solace:
+        condition: service_healthy
 
   subscriber:
     build:
@@ -110,7 +119,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: pass
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
-      - solace
+      solace:
+        condition: service_healthy
 
 volumes:
   db:
