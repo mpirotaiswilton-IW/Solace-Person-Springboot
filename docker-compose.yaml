@@ -11,6 +11,21 @@ services:
       solace-init:
         condition: service_completed_successfully
 
+  subscriber:
+    build:
+      context: ./person_subscriber/
+      dockerfile: ./Dockerfile
+    container_name: subscriber_microservice
+    restart: on-failure
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/admin
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      solace:
+        condition: service_healthy
+
   db:
     image: postgres:13.1-alpine
     restart: always
@@ -103,21 +118,6 @@ services:
       dockerfile: Dockerfile
     container_name: solace-init
     restart: "no"
-    depends_on:
-      solace:
-        condition: service_healthy
-
-  subscriber:
-    build:
-      context: ./person_subscriber/
-      dockerfile: ./Dockerfile
-    container_name: subscriber_microservice
-    restart: on-failure
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/admin
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: pass
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       solace:
         condition: service_healthy

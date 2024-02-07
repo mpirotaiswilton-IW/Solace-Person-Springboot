@@ -15,8 +15,12 @@
 
 1. If not already installed:
 
-- Install Docker on your device (you can use the following link for a guide: [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/))
 - Install the latest version of OpenJDK 17 on your device (The following page has a complete catalogue of OpenJDK downloads: [https://www.openlogic.com/openjdk-downloads](https://www.openlogic.com/openjdk-downloads))
+- Install Docker on your device (you can use the following link for a guide: [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/))
+
+>If you are using Docker Desktop for Windows, make sure to use version **4.26.1** or lower. 
+>
+>The solution will not deploy with `docker-compose` if you are using version **4.27.1**. This is a known issue with this version of Docker Desktop for Windows.
 
 2. Clone this repository or download the .zip file from GitHub (extract the downloaded zip file )
 
