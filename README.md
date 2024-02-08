@@ -29,7 +29,10 @@
 1. Using a Command Line Interface of your choosing, change directory to the downloaded/cloned repository
 
 
-2. To build both of our microservice, you will need to use the following command:  
+2. To build both of our microservice, you will need to build a .jar file for each:  
+* Change directory to `<Directory where Github repo is located>/Solace-Person-Springboot/person_publisher` and run the command below.
+
+* Change directory to `<Directory where Github repo is located>/Solace-Person-Springboot/person_subscriber` and run the command below.
 
 ```
 <# Linux/MacOs #>
@@ -38,9 +41,6 @@
 <# Windows #>
 .\mvnw clean package
 ```
-* Change directory to `<Directory where Github repo is located>/Solace-Person-Springboot/person_publisher` and run the command above.
-
-* Change directory to `<Directory where Github repo is located>/Solace-Person-Springboot/person_subscriber` and run the command above.
 
 3. Once both builds are successful, run this command to deploy them along with an event broker:
 
