@@ -48,7 +48,7 @@
 docker-compose up -d --build
 ```
 
-3. 6 docker containers should now be running:
+4. 6 docker containers should now be running:
     * `publisher-microservice`: where a spring-boot api image, built using a Dockerfile, is containerized. This container is responsible for sending events contaning personal information to the event broker.
     * `subscriber-microservice`: where a spring-boot api image, built using a Dockerfile, is containerized. This container is responsible for consuming events contaning personal information from the event broker to store them as entries into a database.
     * `db`: where a Postgres database is containerized and used by the `person-subscriber` application.
@@ -56,7 +56,7 @@ docker-compose up -d --build
     * `solace`: where a Solace event broker is containerized.
     * `solace-init`: where a python script runs to set up our `solace` container with all the queues and subscribed topics needed for our microservices to communicate.
 
-4. After a few minutes, `publisher-microservice` will have ran and exited, sending events to be consumed by `subscriber-microservice` and populated our database. You can verify the `publisher-microservice` container has exited by running the following command:
+5. After a few minutes, `publisher-microservice` will have ran and exited, sending events to be consumed by `subscriber-microservice` and populated our database. You can verify the `publisher-microservice` container has exited by running the following command:
 ```
 docker ps -f "name=publisher-microservice"
 ```
