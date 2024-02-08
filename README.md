@@ -30,23 +30,27 @@
 
 
 2. To build both of our microservice, you will need to build a .jar file for each:  
-* Change directory to `<Directory where Github repo is located>/Solace-Person-Springboot/person_publisher` and run the command below.
+    #### 1. Build the Publisher
 
-* Change directory to `<Directory where Github repo is located>/Solace-Person-Springboot/person_subscriber` and run the command below.
+    Change directory to ==person_publisher== and run the command below.
 
-```
-<# Linux/MacOs #>
-./mvnw clean package
+    ```
+    <# Linux/MacOs #>
+    ./mvnw clean package
 
-<# Windows #>
-.\mvnw clean package
-```
+    <# Windows #>
+    .\mvnw clean package
+    ```
+
+    #### 2. Build the Subscriber
+    
+    Change directory to ==person_subscriber== and run the same command as in the previous step.
 
 3. Once both builds are successful, run this command to deploy them along with an event broker:
 
-```
-docker-compose up -d --build
-```
+    ```
+    docker-compose up -d --build
+    ```
 
 4. 6 docker containers should now be running:
     * `publisher-microservice`: where a spring-boot api image, built using a Dockerfile, is containerized. This container is responsible for sending events contaning personal information to the event broker.
@@ -57,9 +61,9 @@ docker-compose up -d --build
     * `solace-init`: where a python script runs to set up our `solace` container with all the queues and subscribed topics needed for our microservices to communicate.
 
 5. After a few minutes, `publisher-microservice` will have ran and exited, sending events to be consumed by `subscriber-microservice` and populated our database. You can verify the `publisher-microservice` container has exited by running the following command:
-```
-docker ps -f "name=publisher-microservice"
-```
+    ```
+    docker ps -f "name=publisher-microservice"
+    ```
 
 #### Cleaning up Exited Containers
 
@@ -99,7 +103,7 @@ After successfully logging into pgAdmin, click on `Add New Server` on the Dashbo
 8. In the Object Explorer, under `db > Databases` select `admin`
 9. In pgAdmin menu bar, select `Tools > Query Tool`. This will load a new window with a blank page to write an SQL query to our database.
 10. Run the following query in the query tool: 
-```
-SELECT * FROM people_table
-```
+    ```
+    SELECT * FROM people_table
+    ```
 11. This query should return exactly 1000 rows, you can verify that the list is accurate to the source data by comparing the result of the query to the csv file [Mock_data.csv](https://github.com/mpirotaiswilton-IW/Solace-Person-Springboot/blob/main/person_publisher/src/main/resources/Mock_data.csv)
