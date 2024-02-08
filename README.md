@@ -30,21 +30,25 @@
 
 
 2. To build both of our microservice, you will need to build a .jar file for each:  
-    #### 1. Build the Publisher
+    1. Build the Publisher
+        
+        Change directory to 
+        `<Path to repo>/Solace-Person-Springboot/person_publisher`
+        and run the command below.
 
-    Change directory to ==person_publisher== and run the command below.
+        ```
+        <# Linux/MacOs #>
+        ./mvnw clean package
 
-    ```
-    <# Linux/MacOs #>
-    ./mvnw clean package
+        <# Windows #>
+        .\mvnw clean package
+        ```
 
-    <# Windows #>
-    .\mvnw clean package
-    ```
-
-    #### 2. Build the Subscriber
+    2. Build the Subscriber
     
-    Change directory to ==person_subscriber== and run the same command as in the previous step.
+        Change directory to 
+        `<Path to repo>/Solace-Person-Springboot/person_subscriber`
+        then run the same command as in the previous step.
 
 3. Once both builds are successful, run this command to deploy them along with an event broker:
 
